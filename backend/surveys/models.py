@@ -146,8 +146,8 @@ class Response(models.Model):
         db_column='survey_id'
     )
 
-    user_id = models.AutoField(
-        verbose_name='Идентификатор анонимного пользователя',
+    user_id = models.IntegerField(
+        verbose_name='Идентификатор анонимного пользователя', max_length=8,
         help_text='Например: 1234',
         null=False, blank=False, default=None,
         db_column='response_user_id'
@@ -185,7 +185,7 @@ class Answer(models.Model):
     question_option = models.ForeignKey(
         verbose_name='Вариант ответа',
         to=QuestionOption, on_delete=models.CASCADE,
-        related_name='',
+        related_name='answer',
         null=True, blank=True, default=None,
         db_column='question_option_id'
     )
