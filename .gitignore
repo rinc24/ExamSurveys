@@ -4,7 +4,9 @@
 ### rinc ###
 .DS_Store
 .idea/
-
+**/migrations/**
+!**/migrations
+!**/migrations/__init__.py
 ### Django ###
 *.log
 *.pot
