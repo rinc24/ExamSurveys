@@ -5,7 +5,6 @@
 .DS_Store
 .idea/
 
-
 ### Django ###
 *.log
 *.pot
