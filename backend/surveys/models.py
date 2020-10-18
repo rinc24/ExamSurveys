@@ -17,49 +17,31 @@ class Survey(models.Model):
     start_date = models.DateField(
         verbose_name="Дата начала",
         editable=False,
-        null=False, blank=True, default=date.today(),
+        null=False, blank=True, default=date.today,
         db_column='survey_start_date'
     )
 
     end_date = models.DateField(
         verbose_name="Дата окончания",
-        null=False, blank=False, default=None,
+        null=True, blank=True, default=None,
         db_column='survey_end_date'
     )
 
     description = models.TextField(
         verbose_name='Описание', max_length=1024,
-        help_text='Например: Цель опроса -- получить оценку работы сотрудников Компании и стать лучше.',
+        help_text='Например: Сбор обратной связи от сотрудников Компании',
         null=True, blank=True, default=None,
         db_column='survey_description'
     )
+
+    def __str__(self):
+        return str(self.name)
 
     class Meta:
         ordering = ['start_date', 'name']
         db_table = 'survey'
         verbose_name = 'Опрос'
         verbose_name_plural = 'Опросы'
-
-
-# class QuestionType(models.Model):
-#     id = models.AutoField(
-#         primary_key=True,
-#         db_column='question_type_id'
-#     )
-#
-#     name = models.CharField(
-#         db_column='question_type_name'
-#     )
-#
-#     description = models.CharField(
-#         db_column='question_type_description'
-#     )
-#
-#     class Meta:
-#         ordering = ['description']
-#         db_table = 'question_type'
-#         verbose_name = 'Тип вопроса'
-#         verbose_name_plural = 'Типы вопросов'
 
 
 class Question(models.Model):
@@ -97,6 +79,9 @@ class Question(models.Model):
         db_column='question_text'
     )
 
+    def __str__(self):
+        return str(self.text)
+
     class Meta:
         ordering = ['survey', 'id']
         db_table = 'question'
@@ -125,6 +110,9 @@ class QuestionOption(models.Model):
         db_column='question_option_text'
     )
 
+    def __str__(self):
+        return str(self.text)
+
     class Meta:
         ordering = ['question', 'id']
         db_table = 'question_option'
@@ -147,11 +135,14 @@ class Response(models.Model):
     )
 
     user_id = models.IntegerField(
-        verbose_name='Идентификатор анонимного пользователя', max_length=8,
+        verbose_name='Идентификатор анонимного пользователя',
         help_text='Например: 1234',
         null=False, blank=False, default=None,
         db_column='response_user_id'
     )
+
+    def __str__(self):
+        return f'{self.survey} (User: {self.user_id})'
 
     class Meta:
         ordering = ['survey', 'id']
@@ -197,29 +188,11 @@ class Answer(models.Model):
         db_column='answer_text'
     )
 
+    def __str__(self):
+        return f'{self.question} -- {self.text or self.question_option}'
+
     class Meta:
         ordering = ['response', 'question']
         db_table = 'answer'
         verbose_name = 'Ответ'
         verbose_name_plural = 'Ответы'
-
-
-# class AnswerOption(models.Model):
-#     id = models.AutoField(
-#         primary_key=True,
-#         db_column='answer_option_id'
-#     )
-#
-#     answer = models.ForeignKey(
-#         verbose_name='Ответ',
-#         to=Answer, on_delete=models.CASCADE,
-#         related_name='',
-#         null=False, blank=False, default=None,
-#         db_column='answer_id'
-#     )
-#
-#     class Meta:
-#         ordering = ['answer', 'id']
-#         db_table = 'answer_option'
-#         verbose_name = 'Выбранный вариант ответа'
-#         verbose_name_plural = 'Выбранные варианты ответа'
