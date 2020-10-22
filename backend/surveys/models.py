@@ -16,7 +16,6 @@ class Survey(models.Model):
 
     start_date = models.DateField(
         verbose_name="Дата начала",
-        editable=False,
         null=False, blank=True, default=date.today,
         db_column='survey_start_date'
     )
@@ -120,10 +119,10 @@ class QuestionOption(models.Model):
         verbose_name_plural = 'Варианты ответа'
 
 
-class Response(models.Model):
+class Result(models.Model):
     id = models.AutoField(
         primary_key=True,
-        db_column='response_id'
+        db_column='result_id'
     )
 
     survey = models.ForeignKey(
@@ -138,7 +137,7 @@ class Response(models.Model):
         verbose_name='Идентификатор анонимного пользователя',
         help_text='Например: 1234',
         null=False, blank=False, default=None,
-        db_column='response_user_id'
+        db_column='result_user_id'
     )
 
     def __str__(self):
@@ -146,7 +145,7 @@ class Response(models.Model):
 
     class Meta:
         ordering = ['survey', 'id']
-        db_table = 'response'
+        db_table = 'result'
         verbose_name = 'Результат'
         verbose_name_plural = 'Результаты'
 
@@ -157,12 +156,12 @@ class Answer(models.Model):
         db_column='answer_id'
     )
 
-    response = models.ForeignKey(
+    result = models.ForeignKey(
         verbose_name='Результат',
-        to=Response, on_delete=models.CASCADE,
+        to=Result, on_delete=models.CASCADE,
         related_name='answers',
         null=False, blank=False, default=None,
-        db_column='response_id'
+        db_column='result_id'
     )
 
     question = models.ForeignKey(
@@ -192,7 +191,7 @@ class Answer(models.Model):
         return f'{self.question} -- {self.text or self.question_option}'
 
     class Meta:
-        ordering = ['response', 'question']
+        ordering = ['result', 'question']
         db_table = 'answer'
         verbose_name = 'Ответ'
         verbose_name_plural = 'Ответы'
