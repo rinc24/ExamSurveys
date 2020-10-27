@@ -34,7 +34,13 @@ class Survey(models.Model):
     )
 
     def __str__(self):
-        return str(self.name)
+        string_to_return = f'{self.name} '
+        if self.description:
+            string_to_return += f'({self.description}) '
+        string_to_return += f'| c {self.start_date} '
+        if self.end_date:
+            string_to_return += f'по {self.end_date}'
+        return string_to_return
 
     class Meta:
         ordering = ['start_date', 'name']
@@ -110,13 +116,14 @@ class QuestionOption(models.Model):
     )
 
     def __str__(self):
-        return str(self.text)
+        return f'{self.text} ({self.question})'
 
     class Meta:
         ordering = ['question', 'id']
         db_table = 'question_option'
         verbose_name = 'Вариант ответа'
         verbose_name_plural = 'Варианты ответа'
+        unique_together = ['text', 'question']
 
 
 class Result(models.Model):
@@ -172,12 +179,12 @@ class Answer(models.Model):
         db_column='question_id'
     )
 
-    question_option = models.ForeignKey(
+    question_options = models.ManyToManyField(
         verbose_name='Вариант ответа',
-        to=QuestionOption, on_delete=models.CASCADE,
+        to=QuestionOption,
         related_name='answer',
-        null=True, blank=True, default=None,
-        db_column='question_option_id'
+        blank=True, default=None,
+        db_column='question_options_id'
     )
 
     text = models.TextField(
@@ -188,7 +195,7 @@ class Answer(models.Model):
     )
 
     def __str__(self):
-        return f'{self.question} -- {self.text or self.question_option}'
+        return f'{self.question}: {self.text or [_.text for _ in self.question_options.all()]}'
 
     class Meta:
         ordering = ['result', 'question']

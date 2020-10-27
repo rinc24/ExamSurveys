@@ -1,5 +1,5 @@
 from datetime import date
-from rest_framework.decorators import action, permission_classes
+from rest_framework.decorators import action
 from rest_framework import viewsets, permissions
 from .models import Survey, Question, QuestionOption, Result, Answer
 from surveys import serializers
@@ -8,18 +8,14 @@ from surveys import serializers
 class SurveyViewSet(viewsets.ModelViewSet):
     queryset = Survey.objects.all()
     serializer_class = serializers.SurveySerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]\
 
 
     @action(detail=False)
     def active(self, request):
-        "Возвращает список активных опросов (дата окончания больше или равна сегодняшней)"
+        """Возвращает список активных опросов (дата окончания больше или равна сегодняшней)"""
         self.queryset = self.queryset.filter(end_date__gte=date.today())
         return self.list(self, request)
-    #
-    # @action(detail=True)
-    # def survey(self):
-    #     pass
 
 
 class QuestionViewSet(viewsets.ModelViewSet):
