@@ -34,13 +34,7 @@ class Survey(models.Model):
     )
 
     def __str__(self):
-        string_to_return = f'{self.name} '
-        if self.description:
-            string_to_return += f'({self.description}) '
-        string_to_return += f'| c {self.start_date} '
-        if self.end_date:
-            string_to_return += f'по {self.end_date}'
-        return string_to_return
+        return str(self.name)
 
     class Meta:
         ordering = ['start_date', 'name']
@@ -71,7 +65,7 @@ class Question(models.Model):
 
     type = models.CharField(
         verbose_name='Тип ответа на вопрос', max_length=8,
-        help_text='Например: radio',
+        # help_text='Например: radio',
         choices=QUESTION_TYPE_CHOICES,
         null=False, blank=False, default='text',
         db_column='question_type'
@@ -108,7 +102,7 @@ class QuestionOption(models.Model):
         db_column='question_id'
     )
 
-    text = models.TextField(
+    text = models.CharField(
         verbose_name='Текст варианта ответа', max_length=127,
         help_text='Например: Скорее положительно',
         null=False, blank=False, default=None,
@@ -155,6 +149,7 @@ class Result(models.Model):
         db_table = 'result'
         verbose_name = 'Результат'
         verbose_name_plural = 'Результаты'
+        unique_together = ['survey', 'user_id']
 
 
 class Answer(models.Model):
@@ -194,6 +189,10 @@ class Answer(models.Model):
         db_column='answer_text'
     )
 
+    def display_question_options(self):
+        return ', '.join([ question_option.text for question_option in self.question_options.all() ])
+    display_question_options.short_description = 'Выбранные варианты'
+
     def __str__(self):
         return f'{self.question}: {self.text or [_.text for _ in self.question_options.all()]}'
 
@@ -202,3 +201,4 @@ class Answer(models.Model):
         db_table = 'answer'
         verbose_name = 'Ответ'
         verbose_name_plural = 'Ответы'
+        unique_together = ['result', 'question']
